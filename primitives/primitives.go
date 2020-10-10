@@ -9,23 +9,41 @@ import (
 
 // DrawLine draw a line from p1 to p2 with color c on given buffer b
 func DrawLine(p1, p2 types.Vector2, c color.Color, b *buffer.Buffer) {
-	deltaX := p2.X - p1.X
-	deltaY := p2.Y - p1.Y
+	deltaX := int(math.Abs(p2.X - p1.X))
+	deltaY := -int(math.Abs(p2.Y - p1.Y))
 
-	steps := math.Abs(deltaY)
-	if deltaX > deltaY {
-		steps = math.Abs(deltaX)
+	sX := 1
+	sY := 1
+
+	if p2.X <= p1.X {
+		sX = -1
 	}
 
-	xIncrement := deltaX / steps
-	yIncrement := deltaY / steps
+	if p2.Y <= p1.Y {
+		sY = -1
+	}
 
-	x := p1.X
-	y := p1.Y
-	for i := 0; i < int(steps); i++ {
-		x += xIncrement
-		y += yIncrement
-		b.DrawPixel(int(x), int(y), c)
+	err := deltaX + deltaY
+
+	x := int(p1.X)
+	y := int(p1.Y)
+
+	for {
+		b.DrawPixel(x, y, c)
+		if x == int(p2.X) && y == int(p2.Y) {
+			break
+		}
+		e2 := 2 * err
+
+		if e2 >= deltaY {
+			err += deltaY
+			x += sX
+		}
+
+		if e2 <= deltaX {
+			err += deltaX
+			y += sY
+		}
 	}
 }
 
